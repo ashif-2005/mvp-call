@@ -17,7 +17,6 @@ app.post('/call',(req,res)=>{
     try{
         async function makeCallAndRecord(from, to, twimlUrl) {
             try {
-                // Make a POST request to initiate a call
                 const response = await axios.post(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json`, 
                     `From=${from}&To=${to}&Url=${twimlUrl}&Record=true`, {
                     auth: {
@@ -29,7 +28,6 @@ app.post('/call',(req,res)=>{
                     }
                 });
 
-                // Check if the call was successfully initiated
                 if (response.status === 201) {
                     console.log("Call initiated successfully. SID:", response.data.sid);
                     res.status(200).json({'status':'success','callSid':response.data.sid})
@@ -42,18 +40,37 @@ app.post('/call',(req,res)=>{
             }
         }
 
-        // Example usage: Replace placeholders with actual values
         const from = '+13343414014';
         const to = `+91${req.body.agentNumber}`;
         const twimlUrl = `https://calltrack.onrender.com/twiml/${req.body.clientNumber}`; // URL to TwiML document that handles the call
 
         console.log(twimlUrl)
 
-        // Call the function to make a call and record it
         makeCallAndRecord(from, to, twimlUrl);
 
     }catch(error){
         res.status(400).json({'status':'error','error':error.message})
+    }
+})
+
+app.get('/getLog', async (req,res)=>{
+    try {
+        const response = await axios.get(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json`, {
+            auth: {
+                username: accountSid,
+                password: authToken
+            }
+        });
+        if (response.status === 200) {
+            const callLogs = response.data;
+            callLogs.calls.forEach(call => {
+                res.status(200).json({"Call SID":call.sid,"From":call.from,"To":call.to,"Duration":call.duration,"Status":call.status,"Date Time":call.date_created})
+            });
+        } else {
+            res.status(response.status).json({'status':'error','error':'Failed to retrieve call logs'})
+        }
+    } catch (error) {
+        res.status(response.status).json({'status':'error','error':error})
     }
 })
 
