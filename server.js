@@ -55,6 +55,7 @@ app.post('/call',(req,res)=>{
 
 app.get('/getLog', async (req,res)=>{
     try {
+        var data = []
         const response = await axios.get(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json`, {
             auth: {
                 username: accountSid,
@@ -64,11 +65,12 @@ app.get('/getLog', async (req,res)=>{
         if (response.status === 200) {
             const callLogs = response.data;
             callLogs.calls.forEach(call => {
-                res.status(200).json({"Call SID":call.sid,"From":call.from,"To":call.to,"Duration":call.duration,"Status":call.status,"Date Time":call.date_created})
+                data.add({"Call SID":call.sid,"From":call.from,"To":call.to,"Duration":call.duration,"Status":call.status,"Date Time":call.date_created})
             });
         } else {
-            res.status(response.status).json({'status':'error','error':'Failed to retrieve call logs'})
+            res.status(401).json({'status':'error','error':'Failed to retrieve call logs'})
         }
+        res.status(200).json({"data":data})
     } catch (error) {
         res.status(500).json({'status':'error','error':error})
     }
