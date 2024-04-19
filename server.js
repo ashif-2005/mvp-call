@@ -70,7 +70,7 @@ app.get('/getLog', async (req,res)=>{
             res.status(response.status).json({'status':'error','error':'Failed to retrieve call logs'})
         }
     } catch (error) {
-        res.status(response.status).json({'status':'error','error':error})
+        res.status(500).json({'status':'error','error':error})
     }
 })
 
