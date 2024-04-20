@@ -76,6 +76,11 @@ app.get('/getLog', async (req,res)=>{
     }
 })
 
+app.get('/audio', (req, res) => {
+    const audioFileUrl = 'https://api.twilio.com/2010-04-01/Accounts/AC179885a79b99fc0706b56cf810ed731e/Recordings/RE52e41f8fd94a0d6c37325f6a11668978.mp3'; // Replace with your audio file URL
+    res.redirect(audioFileUrl); // Redirect the user to the audio file link
+});
+
 app.listen(port,()=>{
     console.log(`Listening on port ${port}...`)
 })
