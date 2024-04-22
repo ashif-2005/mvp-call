@@ -55,25 +55,41 @@ app.post('/call',(req,res)=>{
 
 app.get('/getLog', async (req,res)=>{
     try {
-        var data = []
-        const response = await axios.get(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json`, {
-            auth: {
-                username: accountSid,
-                password: authToken
-            }
-        });
-        if (response.status === 200) {
-            const callLogs = response.data;
-            callLogs.calls.forEach(call => {
-                data.push({"Call SID":call.sid,"From":call.from,"To":call.to,"Duration":call.duration,"Status":call.status,"Date Time":call.date_created})
-            });
-        } else {
-            res.status(401).json({'status':'error','error':'Failed to retrieve call logs'})
-        }
-        res.status(200).json({"data":data})
-    } catch (error) {
-        res.status(500).json({'status':'error','error':error})
-    }
+        var data = [];
+          let allCallLogs = [];
+          let nextPageUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json`;
+  
+          // Loop to fetch all pages of call logs
+          while (nextPageUrl) {
+              const response = await axios.get(nextPageUrl, {
+                  auth: {
+                      username: accountSid,
+                      password: authToken
+                  }
+              });
+  
+              // Check if the request was successful
+              if (response.status === 200) {
+                  // Parse the JSON response
+                  const callLogs = response.data;
+                  allCallLogs = allCallLogs.concat(callLogs.calls);
+  
+                  // Check if there's a next page
+                  nextPageUrl = callLogs.next_page_uri ? `https://api.twilio.com${callLogs.next_page_uri}` : null;
+              } else {
+                  console.log("Failed to retrieve call logs. Status code:", response.status);
+                  break;
+              }
+          }
+  
+          // Print or process all call logs
+          allCallLogs.forEach(call => {
+            data.push({"Call SID":call.sid,"From":call.from,"To":call.to,"Duration":call.duration,"Status":call.status,"Date Time":call.date_created})
+          });
+          res.status(200).json({"data":data})
+      } catch (error) {
+          console.error("Error retrieving call logs:", error);
+      }
 })
 
 app.get('/audio', (req, res) => {
