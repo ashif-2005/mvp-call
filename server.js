@@ -84,7 +84,7 @@ app.get('/getLog', async (req,res)=>{
   
           // Print or process all call logs
           allCallLogs.forEach(call => {
-            data.push({"Call SID":call.sid,"From":call.from,"To":call.to,"Duration":call.duration,"Status":call.status,"Date Time":call.date_created})
+            data.push({"Call SID":call.sid,"From":call.from,"To":call.to,"Duration":call.duration,"Status":call.status,"Date Time":call.date_created,"Direction":call.direction})
           });
           res.status(200).json({"data":data})
       } catch (error) {
