@@ -11,7 +11,7 @@ app.use(cors())
 
 const port = process.env.PORT || 8000
 const accountSid = 'ACc4372b9957b7b680dde2cbc9e5338830';
-const authToken = 'c3b451ec4a9515f40f66e7ac000ddd63';
+const authToken = 'c39b99abf1b85474de29b5e70e5414bf';
 
 app.post('/call',(req,res)=>{
     try{
